@@ -1,0 +1,5 @@
+{
+  "name": "Garment Factory Management System",
+  "description": "A comprehensive web application to manage materials, styles, inventory, and purchase orders for a garment factory. This app provides a dashboard with key metrics, detailed management pages for each core area, and simulates key workflows like material requirement calculation and purchase order generation.",
+  "requestFramePermissions": []
+}
