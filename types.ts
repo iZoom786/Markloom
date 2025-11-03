@@ -1,43 +1,44 @@
-// types.ts
-
 export interface User {
     id: string;
     email: string;
     name: string;
 }
 
-export interface SettingItem {
-    id: number;
-    value: string;
+export enum POStatus {
+    Draft = 'Draft',
+    Ordered = 'Ordered',
+    Shipped = 'Shipped',
+    Received = 'Received',
+    Cancelled = 'Cancelled',
 }
 
-export interface Currency {
-    id: number;
-    value: string;
-    is_default: boolean;
+export enum WorkOrderStatus {
+    Pending = 'Pending',
+    InProgress = 'In Progress',
+    Completed = 'Completed',
+    OnHold = 'On Hold',
 }
 
 export interface Style {
     styleCode: string;
     description: string;
-    imageUrl: string;
+    imageUrl?: string;
     productCategory: string;
     brand: string;
     season: string;
     targetCostPrice: number;
-    userId?: string;
 }
 
 export interface SKU {
     skuCode: string;
     styleCode: string;
-    description: string | null;
+    description?: string;
     color: string;
     size: string;
-    barcode: string | null;
+    barcode?: string;
     retailPrice: number;
-    wholesalePrice: number | null;
-    imageUrl: string;
+    wholesalePrice: number;
+    imageUrl?: string;
     isActive: boolean;
 }
 
@@ -47,7 +48,6 @@ export interface Material {
     category: string;
     unitOfMeasure: string;
     costPerUnit: number;
-    supplier: string;
     minOrderQuantity: number;
 }
 
@@ -60,34 +60,21 @@ export interface InventoryItem {
     poNumber?: string;
 }
 
-export enum POStatus {
-    Draft = 'Draft',
-    Ordered = 'Ordered',
-    Delivered = 'Delivered',
-    Cancelled = 'Cancelled',
-}
-
 export interface PurchaseOrder {
     poNumber: string;
     supplierId: string;
     orderDate: string;
     deliveryDate: string;
     status: POStatus;
+    notes?: string;
 }
 
-export interface POItem {
-    poItemId: number;
+export interface PurchaseOrderItem {
+    id?: number;
     poNumber: string;
     materialCode: string;
-    quantityOrdered: number;
-    unitPrice: number;
-}
-
-export enum WorkOrderStatus {
-    Pending = 'Pending',
-    InProgress = 'In Progress',
-    Completed = 'Completed',
-    OnHold = 'On Hold',
+    quantity: number;
+    unitCost: number;
 }
 
 export interface WorkOrder {
@@ -106,4 +93,22 @@ export interface BOM {
     materialCode: string;
     consumptionPerGarment: number;
     wastagePercentage: number;
+}
+
+export interface Supplier {
+    id: string;
+    supplierName: string;
+    contactName?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+}
+
+export interface SettingItem {
+    id: number;
+    value: string;
+}
+
+export interface Currency extends SettingItem {
+    is_default: boolean;
 }

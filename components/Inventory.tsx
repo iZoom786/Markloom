@@ -1,3 +1,5 @@
+
+
 import React, { useState, useMemo } from 'react';
 import { InventoryItem, Material, User } from '../types';
 import Card from './common/Card';
@@ -200,7 +202,8 @@ const Inventory: React.FC<InventoryProps> = ({ user, inventory, setInventory, ma
                                         <td className={`px-6 py-4 font-semibold ${isLowStock ? 'text-red-500' : 'text-green-500'}`}>
                                             <div className="flex items-center">
                                                 {isLowStock ? 'Low Stock' : 'OK'}
-                                                {isLowStock && <AlertTriangleIcon className="w-4 h-4 ml-2 text-red-500" title="Stock is below minimum level" />}
+                                                {/* FIX: The title attribute was not a valid prop for AlertTriangleIcon. Wrapped the icon in a span with a title to provide a tooltip. */}
+                                                {isLowStock && <span title="Stock is below minimum level"><AlertTriangleIcon className="w-4 h-4 ml-2 text-red-500" /></span>}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-center">

@@ -177,7 +177,6 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
 
 
     const selectedSku = selectedWorkOrder ? skusMap.get(selectedWorkOrder.skuCode) : null;
-    const selectedStyle = selectedSku ? stylesMap.get(selectedSku.styleCode) : null;
     const workOrderBOMs = selectedWorkOrder ? boms.filter(b => b.skuCode === selectedWorkOrder.skuCode) : [];
 
     return (
@@ -198,7 +197,7 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th scope="col" className="px-6 py-3">WO Number</th>
-                                <th scope="col" className="px-6 py-3">SKU / Style</th>
+                                <th scope="col" className="px-6 py-3">SKU</th>
                                 <th scope="col" className="px-6 py-3 text-right">Quantity</th>
                                 <th scope="col" className="px-6 py-3">Start Date</th>
                                 <th scope="col" className="px-6 py-3">End Date</th>
@@ -207,38 +206,33 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
                             </tr>
                         </thead>
                         <tbody>
-                            {workOrders.map(wo => {
-                                const sku = skusMap.get(wo.skuCode);
-                                const style = sku ? stylesMap.get(sku.styleCode) : null;
-                                return (
-                                    <tr key={wo.woNumber} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                                            {wo.woNumber}
-                                        </th>
-                                        <td className="px-6 py-4">
-                                            <div className="font-medium">{wo.skuCode}</div>
-                                            <div className="text-xs text-gray-500">{style?.description || 'N/A'}</div>
-                                        </td>
-                                        <td className="px-6 py-4 text-right font-mono">{wo.quantity}</td>
-                                        <td className="px-6 py-4">{new Date(wo.startDate).toLocaleDateString()}</td>
-                                        <td className="px-6 py-4">{new Date(wo.endDate).toLocaleDateString()}</td>
-                                        <td className="px-6 py-4 text-center">{getStatusChip(wo.status)}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center justify-center gap-4">
-                                                <button onClick={() => handleWoClick(wo)} className="text-gray-500 hover:text-blue-700" aria-label="View work order details">
-                                                    <EyeIcon className="w-5 h-5" />
-                                                </button>
-                                                <button onClick={() => handleEditClick(wo)} className="text-blue-500 hover:text-blue-700" aria-label="Edit work order">
-                                                    <PencilIcon className="w-5 h-5" />
-                                                </button>
-                                                <button onClick={() => handleDeleteWorkOrder(wo.woNumber)} className="text-red-500 hover:text-red-700" aria-label="Delete work order">
-                                                    <Trash2Icon className="w-5 h-5" />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
+                            {workOrders.map(wo => (
+                                <tr key={wo.woNumber} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                                        {wo.woNumber}
+                                    </th>
+                                    <td className="px-6 py-4 font-medium">
+                                        {wo.skuCode}
+                                    </td>
+                                    <td className="px-6 py-4 text-right font-mono">{wo.quantity}</td>
+                                    <td className="px-6 py-4">{new Date(wo.startDate).toLocaleDateString()}</td>
+                                    <td className="px-6 py-4">{new Date(wo.endDate).toLocaleDateString()}</td>
+                                    <td className="px-6 py-4 text-center">{getStatusChip(wo.status)}</td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center justify-center gap-4">
+                                            <button onClick={() => handleWoClick(wo)} className="text-gray-500 hover:text-blue-700" aria-label="View work order details">
+                                                <EyeIcon className="w-5 h-5" />
+                                            </button>
+                                            <button onClick={() => handleEditClick(wo)} className="text-blue-500 hover:text-blue-700" aria-label="Edit work order">
+                                                <PencilIcon className="w-5 h-5" />
+                                            </button>
+                                            <button onClick={() => handleDeleteWorkOrder(wo.woNumber)} className="text-red-500 hover:text-red-700" aria-label="Delete work order">
+                                                <Trash2Icon className="w-5 h-5" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
@@ -246,12 +240,12 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
 
             {/* Detail Modal */}
             {selectedWorkOrder && (
-                <Modal isOpen={isDetailModalOpen} onClose={handleCloseDetailModal} title={`Details for ${selectedWorkOrder.woNumber}`} size="xl">
+                <Modal isOpen={isDetailModalOpen} onClose={handleCloseDetailModal} title={`Details for ${selectedWorkOrder.woNumber}`} size="xl" closeOnBackdropClick={false}>
                     <div className="space-y-4">
                         <div>
                             <h4 className="font-semibold text-lg">{selectedWorkOrder.skuCode}</h4>
                              <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Style: {selectedStyle?.description || 'N/A'} ({selectedSku?.color || 'N/A'} / {selectedSku?.size || 'N/A'})
+                                Color: {selectedSku?.color || 'N/A'} / Size: {selectedSku?.size || 'N/A'}
                             </p>
                             <p className="text-sm text-gray-500 dark:text-gray-400">
                                 Quantity: <span className="font-bold">{selectedWorkOrder.quantity} units</span> | Status: <span className="font-bold">{selectedWorkOrder.status}</span>
@@ -302,11 +296,13 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
                     isOpen={isCreateModalOpen || isEditModalOpen} 
                     onClose={() => { setIsCreateModalOpen(false); setIsEditModalOpen(false); setEditingWorkOrder(null); }} 
                     title={isEditModalOpen ? `Edit Work Order ${editingWorkOrder?.woNumber}` : "Create New Work Order"}
+                    closeOnBackdropClick={false}
                 >
                     <form onSubmit={isEditModalOpen ? handleUpdateWorkOrder : handleCreateWorkOrder} className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">SKU</label>
-                            <select name="skuCode" value={isEditModalOpen ? editingWorkOrder?.skuCode : newWorkOrder.skuCode} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            {/* FIX: Use `|| ''` to prevent undefined value for controlled component */}
+                            <select name="skuCode" value={(isEditModalOpen ? editingWorkOrder?.skuCode : newWorkOrder.skuCode) || ''} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                 <option value="" disabled>Select a SKU</option>
                                 {skus.map(sku => {
                                     const style = stylesMap.get(sku.styleCode);
@@ -320,22 +316,26 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Quantity</label>
-                            <input type="number" name="quantity" value={isEditModalOpen ? editingWorkOrder?.quantity : newWorkOrder.quantity} onChange={handleFormChange} required min="1" className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                            {/* FIX: Use `|| 0` to prevent undefined value for controlled component */}
+                            <input type="number" name="quantity" value={(isEditModalOpen ? editingWorkOrder?.quantity : newWorkOrder.quantity) || 0} onChange={handleFormChange} required min="1" className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
-                                <input type="date" name="startDate" value={isEditModalOpen ? editingWorkOrder?.startDate : newWorkOrder.startDate} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                {/* FIX: Use `|| ''` to prevent undefined value for controlled component */}
+                                <input type="date" name="startDate" value={(isEditModalOpen ? editingWorkOrder?.startDate : newWorkOrder.startDate) || ''} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
-                                <input type="date" name="endDate" value={isEditModalOpen ? editingWorkOrder?.endDate : newWorkOrder.endDate} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                {/* FIX: Use `|| ''` to prevent undefined value for controlled component */}
+                                <input type="date" name="endDate" value={(isEditModalOpen ? editingWorkOrder?.endDate : newWorkOrder.endDate) || ''} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                             </div>
                         </div>
                          {isEditModalOpen && (
                              <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                                <select name="status" value={editingWorkOrder?.status} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                {/* FIX: Use `|| ''` to prevent undefined value for controlled component */}
+                                <select name="status" value={editingWorkOrder?.status || ''} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                     {Object.values(WorkOrderStatus).map(status => (
                                         <option key={status} value={status}>{status}</option>
                                     ))}

@@ -41,12 +41,11 @@ interface MaterialsProps {
     defaultCurrency: string;
 }
 
-const initialMaterialState: Omit<Material, 'materialCode' | 'userId'> = {
+const initialMaterialState: Omit<Material, 'materialCode'> = {
     description: '',
     category: '',
     unitOfMeasure: '',
     costPerUnit: 0,
-    supplier: '',
     minOrderQuantity: 1,
 };
 
@@ -162,7 +161,6 @@ const Materials: React.FC<MaterialsProps> = ({ user, materials, setMaterials, se
                                 <th scope="col" className="px-6 py-3">Material Code</th>
                                 <th scope="col" className="px-6 py-3">Description</th>
                                 <th scope="col" className="px-6 py-3">Category</th>
-                                <th scope="col" className="px-6 py-3">Supplier</th>
                                 <th scope="col" className="px-6 py-3 text-right">Cost Per Unit</th>
                                 <th scope="col" className="px-6 py-3 text-center">Actions</th>
                             </tr>
@@ -173,7 +171,6 @@ const Materials: React.FC<MaterialsProps> = ({ user, materials, setMaterials, se
                                     <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{material.materialCode}</th>
                                     <td className="px-6 py-4">{material.description}</td>
                                     <td className="px-6 py-4">{material.category}</td>
-                                    <td className="px-6 py-4">{material.supplier}</td>
                                     <td className="px-6 py-4 text-right font-mono">{defaultCurrency} {material.costPerUnit.toFixed(2)}</td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center justify-center gap-4">
@@ -204,18 +201,12 @@ const Materials: React.FC<MaterialsProps> = ({ user, materials, setMaterials, se
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
                         <textarea name="description" value={materialInForm.description} onChange={handleFormChange} required rows={2} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
-                            <select name="category" value={materialInForm.category} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                <option value="" disabled>Select category</option>
-                                {(settings.materialTypes || []).map(type => <option key={type.id} value={type.value}>{type.value}</option>)}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Supplier</label>
-                            <input type="text" name="supplier" value={materialInForm.supplier} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
-                        </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+                        <select name="category" value={materialInForm.category} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <option value="" disabled>Select category</option>
+                            {(settings.materialTypes || []).map(type => <option key={type.id} value={type.value}>{type.value}</option>)}
+                        </select>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
