@@ -258,6 +258,9 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout }) => {
                 <div className="flex-1 overflow-y-auto p-6">
                     {renderView()}
                 </div>
+                <footer className="bg-gray-800 text-white p-4 text-center text-sm shrink-0">
+                    <p>All rights reserved @2025 POC by Asif Iqbal Paracha</p>
+                </footer>
             </main>
         </div>
     );
