@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 // FIX: Corrected import path for icons
 import { XIcon } from '../icons';
@@ -39,14 +40,14 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, size = 
             onClick={closeOnBackdropClick ? onClose : undefined}
         >
             <div 
-                className={`relative bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full ${sizeClasses[size]} transform transition-all duration-300 ease-in-out`}
+                className={`relative bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]} transform transition-all duration-300 ease-in-out`}
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
+                <div className="flex items-center justify-between p-4 border-b">
+                    <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
                     <button 
                         onClick={onClose}
-                        className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
                     >
                         <XIcon className="w-5 h-5" />
                     </button>

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Card from './common/Card';
 import { XIcon, StarIcon } from './icons';
@@ -120,15 +121,15 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
     const renderCurrencyManager = () => {
         return (
             <div>
-                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Manage Currencies</label>
+                 <label className="block text-sm font-medium text-gray-700">Manage Currencies</label>
                  <div className="mt-2 flex flex-wrap gap-2">
                     {(settings.currencies || []).map((currency: Currency) => (
-                        <span key={currency.id} className="flex items-center bg-gray-200 dark:bg-gray-600 text-sm font-medium px-3 py-1 rounded-full">
+                        <span key={currency.id} className="flex items-center bg-gray-200 text-sm font-medium px-3 py-1 rounded-full">
                             {currency.value}
                             <button onClick={() => handleSetDefaultCurrency(currency.id)} className="ml-2 text-gray-500 hover:text-yellow-500" title="Set as default">
                                 <StarIcon className={`w-4 h-4 ${currency.isDefault ? 'fill-current text-yellow-500' : ''}`} />
                             </button>
-                            <button onClick={() => handleRemoveItem(currency.id, 'currencies', 'currencies')} className="ml-2 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white">
+                            <button onClick={() => handleRemoveItem(currency.id, 'currencies', 'currencies')} className="ml-2 text-gray-500 hover:text-gray-800">
                                 <XIcon className="w-3 h-3"/>
                             </button>
                         </span>
@@ -140,7 +141,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
                         value={newValues.currency}
                         onChange={(e) => setNewValues(prev => ({...prev, currency: e.target.value}))}
                         placeholder="Add new currency (e.g., USD)"
-                        className="w-full md:w-1/3 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        className="w-full md:w-1/3 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                     <button type="button" onClick={() => handleAddItem('currencies', 'currencies')} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Add</button>
                 </div>
@@ -157,13 +158,13 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
         const valueKey = keyMap[type];
 
         return (
-            <div className="border-t dark:border-gray-700 pt-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{title}</label>
+            <div className="border-t pt-6">
+                <label className="block text-sm font-medium text-gray-700">{title}</label>
                 <div className="mt-2 flex flex-wrap gap-2">
                     {(settings[type] || []).map((item: SettingItem) => (
-                        <span key={item.id} className="flex items-center bg-gray-200 dark:bg-gray-600 text-sm font-medium px-3 py-1 rounded-full">
+                        <span key={item.id} className="flex items-center bg-gray-200 text-sm font-medium px-3 py-1 rounded-full">
                             {item.value}
-                            <button onClick={() => handleRemoveItem(item.id, type, table)} className="ml-2 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white">
+                            <button onClick={() => handleRemoveItem(item.id, type, table)} className="ml-2 text-gray-500 hover:text-gray-800">
                                 <XIcon className="w-3 h-3"/>
                             </button>
                         </span>
@@ -175,7 +176,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
                         value={newValues[valueKey]}
                         onChange={(e) => setNewValues(prev => ({...prev, [valueKey]: e.target.value}))}
                         placeholder={`Add new ${valueKey.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
-                        className="w-full md:w-1/3 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        className="w-full md:w-1/3 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                     <button type="button" onClick={() => handleAddItem(type, table)} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Add</button>
                 </div>
@@ -185,7 +186,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
 
     return (
         <div className="space-y-6 max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Application Settings</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Application Settings</h1>
             
             <Card>
                 <div className="space-y-6">

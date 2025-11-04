@@ -166,7 +166,7 @@ const SKUs: React.FC<SKUsProps> = ({ user, skus, setSkus, styles, settings, defa
     return (
          <div className="space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">SKU Management</h1>
+                <h1 className="text-3xl font-bold text-gray-900">SKU Management</h1>
                 <button 
                     onClick={handleOpenAddModal}
                     className="flex items-center justify-center w-full md:w-auto px-4 py-2 font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
@@ -182,12 +182,12 @@ const SKUs: React.FC<SKUsProps> = ({ user, skus, setSkus, styles, settings, defa
                         placeholder="Search by SKU, style, or description..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full md:w-1/2 px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full md:w-1/2 px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <table className="w-full text-sm text-left text-gray-500">
+                        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                              <tr>
                                 <th scope="col" className="px-6 py-3">SKU Code</th>
                                 <th scope="col" className="px-6 py-3">Description</th>
@@ -200,14 +200,14 @@ const SKUs: React.FC<SKUsProps> = ({ user, skus, setSkus, styles, settings, defa
                         </thead>
                         <tbody>
                             {filteredSkus.map(sku => (
-                                <tr key={sku.skuCode} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{sku.skuCode}</th>
+                                <tr key={sku.skuCode} className="bg-white border-b hover:bg-gray-50">
+                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{sku.skuCode}</th>
                                     <td className="px-6 py-4">{sku.description}</td>
                                     <td className="px-6 py-4">{stylesMap.get(sku.styleCode)?.description || sku.styleCode}</td>
                                     <td className="px-6 py-4">{sku.color} / {sku.size}</td>
                                     <td className="px-6 py-4 text-right font-mono">{defaultCurrency} {sku.retailPrice.toFixed(2)}</td>
                                     <td className="px-6 py-4 text-center">
-                                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${sku.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}`}>
+                                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${sku.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                             {sku.isActive ? 'Active' : 'Inactive'}
                                         </span>
                                     </td>
@@ -227,27 +227,27 @@ const SKUs: React.FC<SKUsProps> = ({ user, skus, setSkus, styles, settings, defa
             <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={editingSku ? `Edit SKU: ${editingSku.skuCode}` : "Add New SKU"} size="lg" closeOnBackdropClick={false}>
                  <form onSubmit={handleFormSubmit} className="space-y-4">
                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Style</label>
-                        <select name="styleCode" value={skuInForm.styleCode} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <label className="block text-sm font-medium text-gray-700">Style</label>
+                        <select name="styleCode" value={skuInForm.styleCode} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                             <option value="" disabled>Select a style</option>
                             {styles.map(style => <option key={style.styleCode} value={style.styleCode}>{style.styleCode} - {style.description}</option>)}
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                        <textarea name="description" value={skuInForm.description || ''} onChange={handleFormChange} rows={2} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                        <label className="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea name="description" value={skuInForm.description || ''} onChange={handleFormChange} rows={2} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
                     </div>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Color</label>
-                            <select name="color" value={skuInForm.color} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <label className="block text-sm font-medium text-gray-700">Color</label>
+                            <select name="color" value={skuInForm.color} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                 <option value="" disabled>Select color</option>
                                 {(settings.colors || []).map(color => <option key={color.id} value={color.value}>{color.value}</option>)}
                             </select>
                         </div>
                          <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Size</label>
-                             <select name="size" value={skuInForm.size} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <label className="block text-sm font-medium text-gray-700">Size</label>
+                             <select name="size" value={skuInForm.size} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                 <option value="" disabled>Select size</option>
                                 {(settings.sizes || []).map(size => <option key={size.id} value={size.value}>{size.value}</option>)}
                             </select>
@@ -255,24 +255,24 @@ const SKUs: React.FC<SKUsProps> = ({ user, skus, setSkus, styles, settings, defa
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Retail Price ({defaultCurrency})</label>
-                            <input type="number" name="retailPrice" value={skuInForm.retailPrice} onChange={handleFormChange} required step="0.01" className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                            <label className="block text-sm font-medium text-gray-700">Retail Price ({defaultCurrency})</label>
+                            <input type="number" name="retailPrice" value={skuInForm.retailPrice} onChange={handleFormChange} required step="0.01" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Wholesale Price ({defaultCurrency})</label>
-                            <input type="number" name="wholesalePrice" value={skuInForm.wholesalePrice || ''} onChange={handleFormChange} step="0.01" className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                            <label className="block text-sm font-medium text-gray-700">Wholesale Price ({defaultCurrency})</label>
+                            <input type="number" name="wholesalePrice" value={skuInForm.wholesalePrice || ''} onChange={handleFormChange} step="0.01" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Barcode (UPC/EAN)</label>
-                        <input type="text" name="barcode" value={skuInForm.barcode || ''} onChange={handleFormChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                        <label className="block text-sm font-medium text-gray-700">Barcode (UPC/EAN)</label>
+                        <input type="text" name="barcode" value={skuInForm.barcode || ''} onChange={handleFormChange} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                     </div>
                     <div className="flex items-center">
                         <input type="checkbox" name="isActive" checked={skuInForm.isActive} onChange={handleFormChange} id="isActive" className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                        <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">SKU is Active</label>
+                        <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">SKU is Active</label>
                     </div>
                     <div className="pt-4 flex justify-end gap-3">
-                        <button type="button" onClick={handleCloseModal} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-600 dark:text-gray-200 border border-gray-300 dark:border-gray-500 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
+                        <button type="button" onClick={handleCloseModal} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Cancel</button>
                         <button type="submit" disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:bg-blue-400">
                            {isSubmitting ? 'Saving...' : (editingSku ? 'Save Changes' : 'Save SKU')}
                         </button>

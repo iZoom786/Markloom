@@ -40,10 +40,10 @@ const initialWOState: Omit<WorkOrder, 'woNumber'> = {
 
 const getStatusChip = (status: WorkOrderStatus) => {
     const styles = {
-        [WorkOrderStatus.Pending]: "text-yellow-800 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300",
-        [WorkOrderStatus.InProgress]: "text-blue-800 bg-blue-100 dark:bg-blue-900 dark:text-blue-300",
-        [WorkOrderStatus.Completed]: "text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300",
-        [WorkOrderStatus.OnHold]: "text-gray-800 bg-gray-100 dark:bg-gray-700 dark:text-gray-300",
+        [WorkOrderStatus.Pending]: "text-yellow-800 bg-yellow-100",
+        [WorkOrderStatus.InProgress]: "text-blue-800 bg-blue-100",
+        [WorkOrderStatus.Completed]: "text-green-800 bg-green-100",
+        [WorkOrderStatus.OnHold]: "text-gray-800 bg-gray-100",
     };
     return <span className={`px-2 py-1 text-xs font-medium rounded-full ${styles[status]}`}>{status}</span>;
 }
@@ -215,7 +215,7 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Work Orders</h1>
+                <h1 className="text-3xl font-bold text-gray-900">Work Orders</h1>
                 <button 
                     onClick={() => setIsCreateModalOpen(true)}
                     className="flex items-center justify-center w-full md:w-auto px-4 py-2 font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
@@ -226,8 +226,8 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
             
             <Card>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <table className="w-full text-sm text-left text-gray-500">
+                        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
                                 <th scope="col" className="px-6 py-3">WO Number</th>
                                 <th scope="col" className="px-6 py-3">SKU</th>
@@ -240,8 +240,8 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
                         </thead>
                         <tbody>
                             {workOrders.map(wo => (
-                                <tr key={wo.woNumber} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                                <tr key={wo.woNumber} className="bg-white border-b hover:bg-gray-50">
+                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                                         {wo.woNumber}
                                     </th>
                                     <td className="px-6 py-4 font-medium">
@@ -277,32 +277,32 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
                     <div className="space-y-4">
                         <div>
                             <h4 className="font-semibold text-lg">{selectedWorkOrder.skuCode}</h4>
-                             <p className="text-sm text-gray-500 dark:text-gray-400">
+                             <p className="text-sm text-gray-500">
                                 Color: {selectedSku?.color || 'N/A'} / Size: {selectedSku?.size || 'N/A'}
                             </p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className="text-sm text-gray-500">
                                 Quantity: <span className="font-bold">{selectedWorkOrder.quantity} units</span> | Status: <span className="font-bold">{selectedWorkOrder.status}</span>
                             </p>
                         </div>
-                        <div className="border-t dark:border-gray-700 pt-4">
+                        <div className="border-t pt-4">
                             <div className="flex items-center gap-4 mb-2">
                                 <h5 className="font-semibold">Material Requirements</h5>
                                 {hasBOMs && (
-                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${hasShortfall ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'}`}>
+                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${hasShortfall ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
                                         {hasShortfall ? 'Shortfall' : 'In Stock'}
                                     </span>
                                 )}
                             </div>
                             
                             {!hasBOMs ? (
-                                <div className="text-center py-8 px-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                    <p className="text-gray-500 dark:text-gray-400">No Bill of Materials (BOM) has been defined for this SKU.</p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Please add one in the BOM Builder.</p>
+                                <div className="text-center py-8 px-4 bg-gray-50 rounded-lg">
+                                    <p className="text-gray-500">No Bill of Materials (BOM) has been defined for this SKU.</p>
+                                    <p className="text-sm text-gray-500 mt-1">Please add one in the BOM Builder.</p>
                                 </div>
                             ) : (
-                                <div className="overflow-x-auto border rounded-lg dark:border-gray-700">
-                                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                <div className="overflow-x-auto border rounded-lg">
+                                    <table className="w-full text-sm text-left text-gray-500">
+                                        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                                             <tr>
                                                 <th className="px-4 py-2">Material</th>
                                                 <th className="px-4 py-2 text-right">Total Required</th>
@@ -312,8 +312,8 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
                                         </thead>
                                         <tbody>
                                             {materialRequirements.map(req => (
-                                                <tr key={req.bomId} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                                    <td className="px-4 py-2 font-medium text-gray-900 dark:text-white">{req.material?.description || req.material?.materialCode}</td>
+                                                <tr key={req.bomId} className="bg-white border-b">
+                                                    <td className="px-4 py-2 font-medium text-gray-900">{req.material?.description || req.material?.materialCode}</td>
                                                     <td className="px-4 py-2 text-right font-mono">{req.requiredQty.toFixed(2)} {req.material?.unitOfMeasure}</td>
                                                     <td className="px-4 py-2 text-right font-mono">{req.onHandQty}</td>
                                                     <td className={`px-4 py-2 text-right font-mono font-bold ${req.shortfall > 0 ? 'text-red-500' : 'text-green-500'}`}>
@@ -340,9 +340,9 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
                 >
                     <form onSubmit={isEditModalOpen ? handleUpdateWorkOrder : handleCreateWorkOrder} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">SKU</label>
+                            <label className="block text-sm font-medium text-gray-700">SKU</label>
                             {/* FIX: Use `|| ''` to prevent undefined value for controlled component */}
-                            <select name="skuCode" value={(isEditModalOpen ? editingWorkOrder?.skuCode : newWorkOrder.skuCode) || ''} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <select name="skuCode" value={(isEditModalOpen ? editingWorkOrder?.skuCode : newWorkOrder.skuCode) || ''} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                 <option value="" disabled>Select a SKU</option>
                                 {skus.map(sku => {
                                     const style = stylesMap.get(sku.styleCode);
@@ -355,27 +355,27 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Quantity</label>
+                            <label className="block text-sm font-medium text-gray-700">Quantity</label>
                             {/* FIX: Use `|| 0` to prevent undefined value for controlled component */}
-                            <input type="number" name="quantity" value={(isEditModalOpen ? editingWorkOrder?.quantity : newWorkOrder.quantity) || 0} onChange={handleFormChange} required min="1" className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                            <input type="number" name="quantity" value={(isEditModalOpen ? editingWorkOrder?.quantity : newWorkOrder.quantity) || 0} onChange={handleFormChange} required min="1" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
+                                <label className="block text-sm font-medium text-gray-700">Start Date</label>
                                 {/* FIX: Use `|| ''` to prevent undefined value for controlled component */}
-                                <input type="date" name="startDate" value={(isEditModalOpen ? editingWorkOrder?.startDate : newWorkOrder.startDate) || ''} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                <input type="date" name="startDate" value={(isEditModalOpen ? editingWorkOrder?.startDate : newWorkOrder.startDate) || ''} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
+                                <label className="block text-sm font-medium text-gray-700">End Date</label>
                                 {/* FIX: Use `|| ''` to prevent undefined value for controlled component */}
-                                <input type="date" name="endDate" value={(isEditModalOpen ? editingWorkOrder?.endDate : newWorkOrder.endDate) || ''} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                <input type="date" name="endDate" value={(isEditModalOpen ? editingWorkOrder?.endDate : newWorkOrder.endDate) || ''} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                             </div>
                         </div>
                          {isEditModalOpen && (
                              <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                                <label className="block text-sm font-medium text-gray-700">Status</label>
                                 {/* FIX: Use `|| ''` to prevent undefined value for controlled component */}
-                                <select name="status" value={editingWorkOrder?.status || ''} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <select name="status" value={editingWorkOrder?.status || ''} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                     {Object.values(WorkOrderStatus).map(status => (
                                         <option key={status} value={status}>{status}</option>
                                     ))}
@@ -383,7 +383,7 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
                              </div>
                          )}
                         <div className="pt-4 flex justify-end gap-3">
-                            <button type="button" onClick={() => { setIsCreateModalOpen(false); setIsEditModalOpen(false); setEditingWorkOrder(null); }} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-600 dark:text-gray-200 border border-gray-300 dark:border-gray-500 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
+                            <button type="button" onClick={() => { setIsCreateModalOpen(false); setIsEditModalOpen(false); setEditingWorkOrder(null); }} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Cancel</button>
                             <button type="submit" disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:bg-blue-400">
                                {isSubmitting ? 'Saving...' : (isEditModalOpen ? 'Save Changes' : 'Create Work Order')}
                             </button>

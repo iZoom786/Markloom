@@ -149,7 +149,7 @@ const Inventory: React.FC<InventoryProps> = ({ user, inventory, setInventory, ma
     return (
         <div className="space-y-6">
              <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Inventory Management</h1>
+                <h1 className="text-3xl font-bold text-gray-900">Inventory Management</h1>
                 <button 
                     onClick={handleOpenAddModal}
                     className="flex items-center justify-center w-full md:w-auto px-4 py-2 font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
@@ -165,13 +165,13 @@ const Inventory: React.FC<InventoryProps> = ({ user, inventory, setInventory, ma
                         placeholder="Search by material code or description..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full md:w-1/2 px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full md:w-1/2 px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                 </div>
                 
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <table className="w-full text-sm text-left text-gray-500">
+                        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
                                 <th scope="col" className="px-6 py-3">Material Code</th>
                                 <th scope="col" className="px-6 py-3">Description</th>
@@ -189,8 +189,8 @@ const Inventory: React.FC<InventoryProps> = ({ user, inventory, setInventory, ma
                                 const material = materialsMap.get(item.materialCode);
                                 const isLowStock = item.quantityOnHand < item.minStockLevel;
                                 return (
-                                    <tr key={item.materialCode} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <tr key={item.materialCode} className="bg-white border-b hover:bg-gray-50">
+                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                                             {item.materialCode}
                                         </th>
                                         <td className="px-6 py-4">{material?.description || 'N/A'}</td>
@@ -227,44 +227,44 @@ const Inventory: React.FC<InventoryProps> = ({ user, inventory, setInventory, ma
             <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={modalMode === 'edit' ? `Edit Inventory: ${editingItem?.materialCode}` : 'Add New Inventory Item'}>
                 <form onSubmit={handleFormSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Material</label>
+                        <label className="block text-sm font-medium text-gray-700">Material</label>
                         {modalMode === 'add' ? (
-                            <select name="materialCode" value={itemInForm.materialCode} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <select name="materialCode" value={itemInForm.materialCode} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                 <option value="" disabled>Select a material</option>
                                 {availableMaterialsToAdd.map(m => (
                                     <option key={m.materialCode} value={m.materialCode}>{m.materialCode} - {m.description}</option>
                                 ))}
                             </select>
                         ) : (
-                             <p className="mt-1 text-sm text-gray-900 dark:text-white">{editingItem?.materialCode} - {materialsMap.get(editingItem?.materialCode || '')?.description}</p>
+                             <p className="mt-1 text-sm text-gray-900">{editingItem?.materialCode} - {materialsMap.get(editingItem?.materialCode || '')?.description}</p>
                         )}
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                          <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Quantity On Hand</label>
-                            <input type="number" name="quantityOnHand" value={itemInForm.quantityOnHand} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                            <label className="block text-sm font-medium text-gray-700">Quantity On Hand</label>
+                            <input type="number" name="quantityOnHand" value={itemInForm.quantityOnHand} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Minimum Stock Level</label>
-                            <input type="number" name="minStockLevel" value={itemInForm.minStockLevel} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                            <label className="block text-sm font-medium text-gray-700">Minimum Stock Level</label>
+                            <input type="number" name="minStockLevel" value={itemInForm.minStockLevel} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
-                        <input type="text" name="location" value={itemInForm.location} onChange={handleFormChange} required placeholder="e.g., Aisle 5, Bin 2" className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                        <label className="block text-sm font-medium text-gray-700">Location</label>
+                        <input type="text" name="location" value={itemInForm.location} onChange={handleFormChange} required placeholder="e.g., Aisle 5, Bin 2" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                     </div>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                          <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">GRN Number (Optional)</label>
-                            <input type="text" name="grn" value={itemInForm.grn || ''} onChange={handleFormChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                            <label className="block text-sm font-medium text-gray-700">GRN Number (Optional)</label>
+                            <input type="text" name="grn" value={itemInForm.grn || ''} onChange={handleFormChange} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">PO Number (Optional)</label>
-                            <input type="text" name="poNumber" value={itemInForm.poNumber || ''} onChange={handleFormChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                            <label className="block text-sm font-medium text-gray-700">PO Number (Optional)</label>
+                            <input type="text" name="poNumber" value={itemInForm.poNumber || ''} onChange={handleFormChange} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                         </div>
                     </div>
                     <div className="pt-4 flex justify-end gap-3">
-                        <button type="button" onClick={handleCloseModal} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-600 dark:text-gray-200 border border-gray-300 dark:border-gray-500 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
+                        <button type="button" onClick={handleCloseModal} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Cancel</button>
                         <button type="submit" disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:bg-blue-400">
                            {isSubmitting ? 'Saving...' : 'Save Changes'}
                         </button>

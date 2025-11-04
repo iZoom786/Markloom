@@ -136,16 +136,16 @@ const BOMBuilder: React.FC<BOMBuilderProps> = ({ user, styles, skus, materials, 
 
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Bill of Materials (BOM) Builder</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Bill of Materials (BOM) Builder</h1>
             
             <Card>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Select Style</label>
+                        <label className="block text-sm font-medium text-gray-700">Select Style</label>
                         <select
                             value={selectedStyleCode}
                             onChange={handleStyleChange}
-                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         >
                             <option value="" disabled>Choose a style</option>
                             {styles.map(style => (
@@ -156,12 +156,12 @@ const BOMBuilder: React.FC<BOMBuilderProps> = ({ user, styles, skus, materials, 
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Select SKU</label>
+                        <label className="block text-sm font-medium text-gray-700">Select SKU</label>
                         <select
                             value={selectedSkuCode}
                             onChange={handleSkuChange}
                             disabled={!selectedStyleCode}
-                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-200 dark:disabled:bg-gray-800"
+                            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-200"
                         >
                             <option value="" disabled>Choose an SKU</option>
                             {skusForSelectedStyle.map(sku => (
@@ -176,9 +176,9 @@ const BOMBuilder: React.FC<BOMBuilderProps> = ({ user, styles, skus, materials, 
                 {selectedSkuCode && (
                     <div>
                         <h2 className="text-xl font-semibold mb-4">BOM for {selectedSkuCode}</h2>
-                        <div className="overflow-x-auto border rounded-lg dark:border-gray-700">
-                            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <div className="overflow-x-auto border rounded-lg">
+                            <table className="w-full text-sm text-left text-gray-500">
+                                <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                                     <tr>
                                         <th scope="col" className="px-6 py-3">Material</th>
                                         <th scope="col" className="px-6 py-3 text-right">Consumption</th>
@@ -192,8 +192,8 @@ const BOMBuilder: React.FC<BOMBuilderProps> = ({ user, styles, skus, materials, 
                                         const material = materialsMap.get(item.materialCode);
                                         const cost = material ? item.consumptionPerGarment * material.costPerUnit * (1 + item.wastagePercentage / 100) : 0;
                                         return (
-                                            <tr key={item.bomId} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            <tr key={item.bomId} className="bg-white border-b">
+                                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                                                     {material?.description || item.materialCode}
                                                 </th>
                                                 <td className="px-6 py-4 text-right font-mono">{item.consumptionPerGarment.toFixed(2)} {material?.unitOfMeasure}</td>
@@ -208,7 +208,7 @@ const BOMBuilder: React.FC<BOMBuilderProps> = ({ user, styles, skus, materials, 
                                         );
                                     })}
                                 </tbody>
-                                <tfoot className="bg-gray-50 dark:bg-gray-700">
+                                <tfoot className="bg-gray-50">
                                     <tr>
                                         <td colSpan={3} className="px-6 py-3 text-right font-bold">Total Estimated Cost</td>
                                         <td className="px-6 py-3 text-right font-bold font-mono">{defaultCurrency} {totalBomCost.toFixed(2)}</td>
@@ -220,21 +220,21 @@ const BOMBuilder: React.FC<BOMBuilderProps> = ({ user, styles, skus, materials, 
                         
                         <div className="mt-6">
                             <h3 className="text-lg font-semibold mb-2">Add Material to BOM</h3>
-                            <form onSubmit={handleAddItemToBOM} className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg flex flex-col md:flex-row md:items-end md:gap-4 space-y-4 md:space-y-0">
+                            <form onSubmit={handleAddItemToBOM} className="p-4 bg-gray-50 rounded-lg flex flex-col md:flex-row md:items-end md:gap-4 space-y-4 md:space-y-0">
                                 <div className="flex-grow">
                                     <label className="block text-xs font-medium mb-1">Material</label>
-                                    <select name="materialCode" value={newBomItem.materialCode} onChange={handleNewItemChange} required className="w-full p-2 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-md text-sm">
+                                    <select name="materialCode" value={newBomItem.materialCode} onChange={handleNewItemChange} required className="w-full p-2 bg-white border border-gray-300 rounded-md text-sm">
                                         <option value="" disabled>Select material</option>
                                         {availableMaterials.map(m => <option key={m.materialCode} value={m.materialCode}>{m.description}</option>)}
                                     </select>
                                 </div>
                                 <div>
                                     <label className="block text-xs font-medium mb-1">Consumption per Garment</label>
-                                    <input type="number" name="consumptionPerGarment" value={newBomItem.consumptionPerGarment} onChange={handleNewItemChange} step="0.01" min="0" required className="w-full p-2 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-md text-sm" />
+                                    <input type="number" name="consumptionPerGarment" value={newBomItem.consumptionPerGarment} onChange={handleNewItemChange} step="0.01" min="0" required className="w-full p-2 bg-white border border-gray-300 rounded-md text-sm" />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-medium mb-1">Wastage %</label>
-                                    <input type="number" name="wastagePercentage" value={newBomItem.wastagePercentage} onChange={handleNewItemChange} step="0.01" min="0" required className="w-full p-2 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-md text-sm" />
+                                    <input type="number" name="wastagePercentage" value={newBomItem.wastagePercentage} onChange={handleNewItemChange} step="0.01" min="0" required className="w-full p-2 bg-white border border-gray-300 rounded-md text-sm" />
                                 </div>
                                 <button type="submit" disabled={isSubmitting} className="w-full md:w-auto flex items-center justify-center px-4 py-2 font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-blue-400">
                                     <PlusIcon className="w-5 h-5 mr-1" />

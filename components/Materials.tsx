@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Material, User, SettingItem } from '../types';
 import Card from './common/Card';
@@ -144,7 +145,7 @@ const Materials: React.FC<MaterialsProps> = ({ user, materials, setMaterials, se
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Materials Management</h1>
+                <h1 className="text-3xl font-bold text-gray-900">Materials Management</h1>
                 <button 
                     onClick={handleOpenAddModal}
                     className="flex items-center justify-center w-full md:w-auto px-4 py-2 font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
@@ -155,8 +156,8 @@ const Materials: React.FC<MaterialsProps> = ({ user, materials, setMaterials, se
             
             <Card>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <table className="w-full text-sm text-left text-gray-500">
+                        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
                                 <th scope="col" className="px-6 py-3">Material Code</th>
                                 <th scope="col" className="px-6 py-3">Description</th>
@@ -167,8 +168,8 @@ const Materials: React.FC<MaterialsProps> = ({ user, materials, setMaterials, se
                         </thead>
                         <tbody>
                             {materials.map(material => (
-                                <tr key={material.materialCode} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{material.materialCode}</th>
+                                <tr key={material.materialCode} className="bg-white border-b hover:bg-gray-50">
+                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{material.materialCode}</th>
                                     <td className="px-6 py-4">{material.description}</td>
                                     <td className="px-6 py-4">{material.category}</td>
                                     <td className="px-6 py-4 text-right font-mono">{defaultCurrency} {material.costPerUnit.toFixed(2)}</td>
@@ -193,40 +194,40 @@ const Materials: React.FC<MaterialsProps> = ({ user, materials, setMaterials, se
                 <form onSubmit={handleFormSubmit} className="space-y-4">
                     {editingMaterial && 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Material Code</label>
-                            <input type="text" value={editingMaterial.materialCode} disabled className="mt-1 block w-full px-3 py-2 bg-gray-200 dark:bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm sm:text-sm" />
+                            <label className="block text-sm font-medium text-gray-700">Material Code</label>
+                            <input type="text" value={editingMaterial.materialCode} disabled className="mt-1 block w-full px-3 py-2 bg-gray-200 border border-gray-300 rounded-md shadow-sm sm:text-sm" />
                         </div>
                     }
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                        <textarea name="description" value={materialInForm.description} onChange={handleFormChange} required rows={2} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                        <label className="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea name="description" value={materialInForm.description} onChange={handleFormChange} required rows={2} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
-                        <select name="category" value={materialInForm.category} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <label className="block text-sm font-medium text-gray-700">Category</label>
+                        <select name="category" value={materialInForm.category} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                             <option value="" disabled>Select category</option>
                             {(settings.materialTypes || []).map(type => <option key={type.id} value={type.value}>{type.value}</option>)}
                         </select>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Cost Per Unit ({defaultCurrency})</label>
-                            <input type="number" name="costPerUnit" value={materialInForm.costPerUnit} onChange={handleFormChange} required step="0.01" className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                            <label className="block text-sm font-medium text-gray-700">Cost Per Unit ({defaultCurrency})</label>
+                            <input type="number" name="costPerUnit" value={materialInForm.costPerUnit} onChange={handleFormChange} required step="0.01" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                         </div>
                          <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Unit of Measure</label>
-                             <select name="unitOfMeasure" value={materialInForm.unitOfMeasure} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <label className="block text-sm font-medium text-gray-700">Unit of Measure</label>
+                             <select name="unitOfMeasure" value={materialInForm.unitOfMeasure} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                 <option value="" disabled>Select unit</option>
                                 {(settings.unitsOfMeasure || []).map(uom => <option key={uom.id} value={uom.value}>{uom.value}</option>)}
                             </select>
                         </div>
                          <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Min. Order Qty</label>
-                            <input type="number" name="minOrderQuantity" value={materialInForm.minOrderQuantity} onChange={handleFormChange} required step="1" className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                            <label className="block text-sm font-medium text-gray-700">Min. Order Qty</label>
+                            <input type="number" name="minOrderQuantity" value={materialInForm.minOrderQuantity} onChange={handleFormChange} required step="1" className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                         </div>
                     </div>
                     <div className="pt-4 flex justify-end gap-3">
-                        <button type="button" onClick={handleCloseModal} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-600 dark:text-gray-200 border border-gray-300 dark:border-gray-500 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
+                        <button type="button" onClick={handleCloseModal} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Cancel</button>
                         <button type="submit" disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:bg-blue-400">
                            {isSubmitting ? 'Saving...' : (editingMaterial ? 'Save Changes' : 'Save Material')}
                         </button>

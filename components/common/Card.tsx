@@ -10,7 +10,7 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ children, className = '', onClick }) => {
     return (
-        <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 ${className}`} onClick={onClick}>
+        <div className={`bg-white rounded-xl shadow-md p-6 ${className}`} onClick={onClick}>
             {children}
         </div>
     );

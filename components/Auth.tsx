@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Card from './common/Card';
 
@@ -32,44 +33,44 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onSignUp, error }) => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center items-center p-4">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Marklooms ERP</h1>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">Please sign in to continue</p>
+        <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center p-4">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Marklooms ERP</h1>
+            <p className="text-gray-600 mb-6">Please sign in to continue</p>
             <Card className="w-full max-w-md">
-                <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">
+                <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">
                     {isLoginView ? 'Sign In' : 'Create Account'}
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {!isLoginView && (
                         <div>
-                            <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+                            <label className="block mb-1 text-sm font-medium text-gray-700">Name</label>
                             <input
                                 type="text"
                                 value={name}
                                 onChange={e => setName(e.target.value)}
                                 required
-                                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                             />
                         </div>
                     )}
                     <div>
-                        <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">Email Address</label>
+                        <label className="block mb-1 text-sm font-medium text-gray-700">Email Address</label>
                         <input
                             type="email"
                             value={email}
                             onChange={e => setEmail(e.target.value)}
                             required
-                            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                     </div>
                     <div>
-                        <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                        <label className="block mb-1 text-sm font-medium text-gray-700">Password</label>
                         <input
                             type="password"
                             value={password}
                             onChange={e => setPassword(e.target.value)}
                             required
-                            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                     </div>
                     
@@ -80,7 +81,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onSignUp, error }) => {
                     </button>
                 </form>
                 <div className="mt-4 text-center">
-                    <button onClick={() => setIsLoginView(!isLoginView)} className="text-sm text-blue-600 hover:underline dark:text-blue-400">
+                    <button onClick={() => setIsLoginView(!isLoginView)} className="text-sm text-blue-600 hover:underline">
                         {isLoginView ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
                     </button>
                 </div>

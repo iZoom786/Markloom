@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { User } from './types';
 import Auth, { AuthDetails, SignUpDetails } from './components/Auth';
@@ -5,7 +6,7 @@ import MainApp from './components/MainApp';
 import { supabase } from './lib/supabaseClient';
 import { Session } from '@supabase/supabase-js';
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [authError, setAuthError] = useState<string>('');
@@ -70,7 +71,7 @@ const App: React.FC = () => {
     };
     
     if (loading) {
-        return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center"><p className="text-white">Loading...</p></div>;
+        return <div className="min-h-screen bg-gray-50 flex justify-center items-center"><p className="text-gray-900">Loading...</p></div>;
     }
 
     if (!currentUser) {
@@ -79,5 +80,13 @@ const App: React.FC = () => {
 
     return <MainApp user={currentUser} onLogout={handleLogout} />;
 };
+
+
+const App: React.FC = () => {
+    return (
+        <AppContent />
+    );
+};
+
 
 export default App;
