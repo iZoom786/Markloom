@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { WorkOrder, Style, WorkOrderStatus, BOM, Material, InventoryItem, User, SKU } from '../types';
 import Card from './common/Card';
@@ -176,8 +177,40 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
     };
 
 
-    const selectedSku = selectedWorkOrder ? skusMap.get(selectedWorkOrder.skuCode) : null;
-    const workOrderBOMs = selectedWorkOrder ? boms.filter(b => b.skuCode === selectedWorkOrder.skuCode) : [];
+    const { selectedSku, materialRequirements, hasShortfall, hasBOMs } = useMemo(() => {
+        if (!selectedWorkOrder) {
+            return { selectedSku: null, materialRequirements: [], hasShortfall: false, hasBOMs: false };
+        }
+
+        const sku = skusMap.get(selectedWorkOrder.skuCode);
+        const bomsForSku = boms.filter(b => b.skuCode === selectedWorkOrder.skuCode);
+        
+        const requirements = bomsForSku.map(bom => {
+            const material = materialsMap.get(bom.materialCode);
+            const inventoryItem = inventoryMap.get(bom.materialCode);
+            const requiredQty = bom.consumptionPerGarment * selectedWorkOrder.quantity * (1 + bom.wastagePercentage / 100);
+            const onHandQty = inventoryItem?.quantityOnHand || 0;
+            const shortfall = requiredQty - onHandQty;
+            
+            return {
+                bomId: bom.bomId,
+                material,
+                requiredQty,
+                onHandQty,
+                shortfall: Math.max(0, shortfall),
+            };
+        });
+
+        const shortfallExists = requirements.some(item => item.shortfall > 0);
+        const bomExists = requirements.length > 0;
+
+        return {
+            selectedSku: sku,
+            materialRequirements: requirements,
+            hasShortfall: shortfallExists,
+            hasBOMs: bomExists
+        };
+    }, [selectedWorkOrder, skusMap, boms, materialsMap, inventoryMap]);
 
     return (
         <div className="space-y-6">
@@ -252,39 +285,46 @@ const WorkOrders: React.FC<WorkOrdersProps> = ({ user, workOrders, setWorkOrders
                             </p>
                         </div>
                         <div className="border-t dark:border-gray-700 pt-4">
-                            <h5 className="font-semibold mb-2">Material Requirements</h5>
-                            <div className="overflow-x-auto border rounded-lg dark:border-gray-700">
-                                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                        <tr>
-                                            <th className="px-4 py-2">Material</th>
-                                            <th className="px-4 py-2 text-right">Total Required</th>
-                                            <th className="px-4 py-2 text-right">On Hand</th>
-                                            <th className="px-4 py-2 text-right">Shortfall</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {workOrderBOMs.map(bom => {
-                                            const material = materialsMap.get(bom.materialCode);
-                                            const inventory = inventoryMap.get(bom.materialCode);
-                                            const requiredQty = bom.consumptionPerGarment * selectedWorkOrder.quantity * (1 + bom.wastagePercentage / 100);
-                                            const onHandQty = inventory?.quantityOnHand || 0;
-                                            const shortfall = requiredQty - onHandQty;
-
-                                            return (
-                                                <tr key={bom.bomId} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                                    <td className="px-4 py-2 font-medium text-gray-900 dark:text-white">{material?.description || bom.materialCode}</td>
-                                                    <td className="px-4 py-2 text-right font-mono">{requiredQty.toFixed(2)} {material?.unitOfMeasure}</td>
-                                                    <td className="px-4 py-2 text-right font-mono">{onHandQty}</td>
-                                                    <td className={`px-4 py-2 text-right font-mono font-bold ${shortfall > 0 ? 'text-red-500' : 'text-green-500'}`}>
-                                                        {shortfall > 0 ? shortfall.toFixed(2) : '0'}
+                            <div className="flex items-center gap-4 mb-2">
+                                <h5 className="font-semibold">Material Requirements</h5>
+                                {hasBOMs && (
+                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${hasShortfall ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'}`}>
+                                        {hasShortfall ? 'Shortfall' : 'In Stock'}
+                                    </span>
+                                )}
+                            </div>
+                            
+                            {!hasBOMs ? (
+                                <div className="text-center py-8 px-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                    <p className="text-gray-500 dark:text-gray-400">No Bill of Materials (BOM) has been defined for this SKU.</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Please add one in the BOM Builder.</p>
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto border rounded-lg dark:border-gray-700">
+                                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                            <tr>
+                                                <th className="px-4 py-2">Material</th>
+                                                <th className="px-4 py-2 text-right">Total Required</th>
+                                                <th className="px-4 py-2 text-right">On Hand</th>
+                                                <th className="px-4 py-2 text-right">Shortfall</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {materialRequirements.map(req => (
+                                                <tr key={req.bomId} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                                    <td className="px-4 py-2 font-medium text-gray-900 dark:text-white">{req.material?.description || req.material?.materialCode}</td>
+                                                    <td className="px-4 py-2 text-right font-mono">{req.requiredQty.toFixed(2)} {req.material?.unitOfMeasure}</td>
+                                                    <td className="px-4 py-2 text-right font-mono">{req.onHandQty}</td>
+                                                    <td className={`px-4 py-2 text-right font-mono font-bold ${req.shortfall > 0 ? 'text-red-500' : 'text-green-500'}`}>
+                                                        {req.shortfall > 0 ? req.shortfall.toFixed(2) : '0.00'}
                                                     </td>
                                                 </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </Modal>

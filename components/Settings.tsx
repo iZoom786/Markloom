@@ -10,6 +10,7 @@ interface SettingsData {
     sizes: SettingItem[];
     materialTypes: SettingItem[];
     unitsOfMeasure: SettingItem[];
+    poStatuses: SettingItem[];
 }
 
 interface SettingsProps {
@@ -17,20 +18,36 @@ interface SettingsProps {
     setSettings: React.Dispatch<React.SetStateAction<any>>;
 }
 
+// Helper to convert snake_case object keys to camelCase from Supabase
+const toCamelCase = <T extends {}>(obj: any): T => {
+    if (obj === null || typeof obj !== 'object') return obj;
+    if (Array.isArray(obj)) return obj.map(toCamelCase) as any;
+
+    const newObj: any = {};
+    for (let key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const camelKey = key.replace(/_([a-z])/g, g => g[1].toUpperCase());
+            newObj[camelKey] = toCamelCase(obj[key]);
+        }
+    }
+    return newObj as T;
+};
+
 const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
     const [newValues, setNewValues] = useState({
         currency: '',
         color: '',
         size: '',
         materialType: '',
-        unitOfMeasure: ''
+        unitOfMeasure: '',
+        poStatus: ''
     });
 
     const handleAddItem = async (
-        type: 'currencies' | 'colors' | 'sizes' | 'materialTypes' | 'unitsOfMeasure',
-        table: 'currencies' | 'colors' | 'sizes' | 'material_types' | 'units_of_measure'
+        type: 'currencies' | 'colors' | 'sizes' | 'materialTypes' | 'unitsOfMeasure' | 'poStatuses',
+        table: 'currencies' | 'colors' | 'sizes' | 'material_types' | 'units_of_measure' | 'po_statuses'
     ) => {
-        const keyMap = { currencies: 'currency', colors: 'color', sizes: 'size', materialTypes: 'materialType', unitsOfMeasure: 'unitOfMeasure' };
+        const keyMap = { currencies: 'currency', colors: 'color', sizes: 'size', materialTypes: 'materialType', unitsOfMeasure: 'unitOfMeasure', poStatuses: 'poStatus' };
         const value = newValues[keyMap[type]].trim();
         
         if (!value) return;
@@ -45,15 +62,16 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
         if (error) {
             alert(`Error adding item: ${error.message}`);
         } else if (data) {
-            setSettings((prev: SettingsData) => ({ ...prev, [type]: [...prev[type], data] }));
+            const newItem = toCamelCase(data);
+            setSettings((prev: SettingsData) => ({ ...prev, [type]: [...prev[type], newItem] }));
             setNewValues(prev => ({ ...prev, [keyMap[type]]: '' }));
         }
     };
     
     const handleRemoveItem = async (
         id: number,
-        type: 'currencies' | 'colors' | 'sizes' | 'materialTypes' | 'unitsOfMeasure',
-        table: 'currencies' | 'colors' | 'sizes' | 'material_types' | 'units_of_measure'
+        type: 'currencies' | 'colors' | 'sizes' | 'materialTypes' | 'unitsOfMeasure' | 'poStatuses',
+        table: 'currencies' | 'colors' | 'sizes' | 'material_types' | 'units_of_measure' | 'po_statuses'
     ) => {
         const { error } = await supabase.from(table).delete().eq('id', id);
         if (error) {
@@ -92,7 +110,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
              setSettings((prev: SettingsData) => {
                 const updatedCurrencies = prev.currencies.map(c => ({
                     ...c,
-                    is_default: c.id === currencyId
+                    isDefault: c.id === currencyId
                 }));
                 return { ...prev, currencies: updatedCurrencies };
             });
@@ -108,7 +126,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
                         <span key={currency.id} className="flex items-center bg-gray-200 dark:bg-gray-600 text-sm font-medium px-3 py-1 rounded-full">
                             {currency.value}
                             <button onClick={() => handleSetDefaultCurrency(currency.id)} className="ml-2 text-gray-500 hover:text-yellow-500" title="Set as default">
-                                <StarIcon className={`w-4 h-4 ${currency.is_default ? 'fill-current text-yellow-500' : ''}`} />
+                                <StarIcon className={`w-4 h-4 ${currency.isDefault ? 'fill-current text-yellow-500' : ''}`} />
                             </button>
                             <button onClick={() => handleRemoveItem(currency.id, 'currencies', 'currencies')} className="ml-2 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white">
                                 <XIcon className="w-3 h-3"/>
@@ -132,10 +150,10 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
 
     const renderListManager = (
         title: string,
-        type: 'colors' | 'sizes' | 'materialTypes' | 'unitsOfMeasure',
-        table: 'colors' | 'sizes' | 'material_types' | 'units_of_measure'
+        type: 'colors' | 'sizes' | 'materialTypes' | 'unitsOfMeasure' | 'poStatuses',
+        table: 'colors' | 'sizes' | 'material_types' | 'units_of_measure' | 'po_statuses'
     ) => {
-        const keyMap = { colors: 'color', sizes: 'size', materialTypes: 'materialType', unitsOfMeasure: 'unitOfMeasure' };
+        const keyMap = { colors: 'color', sizes: 'size', materialTypes: 'materialType', unitsOfMeasure: 'unitOfMeasure', poStatuses: 'poStatus' };
         const valueKey = keyMap[type];
 
         return (
@@ -176,6 +194,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
                     {renderListManager('Product Sizes', 'sizes', 'sizes')}
                     {renderListManager('Material Types', 'materialTypes', 'material_types')}
                     {renderListManager('Units of Measure', 'unitsOfMeasure', 'units_of_measure')}
+                    {renderListManager('Purchase Order Statuses', 'poStatuses', 'po_statuses')}
                 </div>
             </Card>
         </div>

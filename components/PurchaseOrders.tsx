@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { PurchaseOrder, POStatus, PurchaseOrderItem, Material, User, Supplier } from '../types';
+import { PurchaseOrder, POStatus, PurchaseOrderItem, Material, User, Supplier, SettingItem } from '../types';
 import Card from './common/Card';
 import Modal from './common/Modal';
 import { PlusIcon, PencilIcon, Trash2Icon, EyeIcon } from './icons';
@@ -18,12 +18,25 @@ const toCamelCase = <T extends {}>(obj: any): T => {
     return newObj as T;
 };
 
+// Helper to convert camelCase object keys to snake_case for Supabase
+const toSnakeCase = (obj: Record<string, any>) => {
+    const newObj: Record<string, any> = {};
+    for (let key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+            newObj[snakeKey] = obj[key];
+        }
+    }
+    return newObj;
+};
+
 interface PurchaseOrdersProps {
     user: User;
     purchaseOrders: PurchaseOrder[];
     setPurchaseOrders: React.Dispatch<React.SetStateAction<PurchaseOrder[]>>;
     materials: Material[];
     suppliers: Supplier[];
+    poStatuses: SettingItem[];
     defaultCurrency: string;
 }
 
@@ -46,7 +59,7 @@ const getStatusChip = (status: POStatus) => {
     return <span className={`px-2 py-1 text-xs font-medium rounded-full ${styles[status]}`}>{status}</span>;
 }
 
-const PurchaseOrders: React.FC<PurchaseOrdersProps> = ({ user, purchaseOrders, setPurchaseOrders, materials, suppliers, defaultCurrency }) => {
+const PurchaseOrders: React.FC<PurchaseOrdersProps> = ({ user, purchaseOrders, setPurchaseOrders, materials, suppliers, poStatuses, defaultCurrency }) => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingPO, setEditingPO] = useState<PurchaseOrder | null>(null);
     const [poInForm, setPoInForm] = useState(initialPOState);
@@ -63,7 +76,9 @@ const PurchaseOrders: React.FC<PurchaseOrdersProps> = ({ user, purchaseOrders, s
 
     const handleOpenCreateModal = () => {
         setEditingPO(null);
-        setPoInForm(initialPOState);
+        const defaultStatus = poStatuses.length > 0 ? poStatuses[0].value as POStatus : POStatus.Draft;
+        const defaultSupplier = suppliers.length > 0 ? suppliers[0].id : '';
+        setPoInForm({ ...initialPOState, status: defaultStatus, supplierId: defaultSupplier });
         setIsCreateModalOpen(true);
     };
 
@@ -83,15 +98,16 @@ const PurchaseOrders: React.FC<PurchaseOrdersProps> = ({ user, purchaseOrders, s
 
         if (editingPO) {
             // Update logic
+            const poDataForUpdate = {
+                supplier_id: poInForm.supplierId,
+                order_date: poInForm.orderDate,
+                delivery_date: poInForm.deliveryDate,
+                status: poInForm.status,
+                notes: poInForm.notes,
+            };
             const { error } = await supabase
                 .from('purchase_orders')
-                .update({
-                    supplier_id: poInForm.supplierId,
-                    order_date: poInForm.orderDate,
-                    delivery_date: poInForm.deliveryDate,
-                    status: poInForm.status,
-                    notes: poInForm.notes,
-                })
+                .update(poDataForUpdate)
                 .eq('po_number', editingPO.poNumber);
 
             if (error) {
@@ -103,9 +119,10 @@ const PurchaseOrders: React.FC<PurchaseOrdersProps> = ({ user, purchaseOrders, s
         } else {
             // Create logic
             const poNumber = `PO-${Date.now()}`;
+            const poToInsert = { ...poInForm, poNumber };
             const { data, error } = await supabase
                 .from('purchase_orders')
-                .insert({ ...poInForm, po_number: poNumber, supplier_id: poInForm.supplierId })
+                .insert(toSnakeCase(poToInsert))
                 .select()
                 .single();
 
@@ -207,7 +224,7 @@ const PurchaseOrders: React.FC<PurchaseOrdersProps> = ({ user, purchaseOrders, s
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
                         <select name="status" value={poInForm.status} onChange={handleFormChange} required className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                            {Object.values(POStatus).map(s => <option key={s} value={s}>{s}</option>)}
+                            {poStatuses.map(s => <option key={s.id} value={s.value}>{s.value}</option>)}
                         </select>
                     </div>
                     <div>

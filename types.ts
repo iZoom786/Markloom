@@ -110,5 +110,5 @@ export interface SettingItem {
 }
 
 export interface Currency extends SettingItem {
-    is_default: boolean;
+    isDefault: boolean;
 }
