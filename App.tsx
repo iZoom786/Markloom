@@ -1,45 +1,84 @@
-
 import React, { useState, useEffect } from 'react';
-import { User } from './types';
-import Auth, { AuthDetails, SignUpDetails } from './components/Auth';
+import { Profile } from './types';
+import Auth, { AuthDetails } from './components/Auth';
 import MainApp from './components/MainApp';
 import { supabase } from './lib/supabaseClient';
 import { Session } from '@supabase/supabase-js';
 
+// Helper to convert snake_case object keys to camelCase from Supabase
+const toCamelCase = <T extends {}>(obj: any): T => {
+    if (!obj || typeof obj !== 'object') return obj as T;
+    const newObj: any = {};
+    for (let key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const camelKey = key.replace(/_([a-z])/g, g => g[1].toUpperCase());
+            newObj[camelKey] = obj[key];
+        }
+    }
+    return newObj as T;
+};
+
+
 const AppContent: React.FC = () => {
-    const [session, setSession] = useState<Session | null>(null);
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const [currentUser, setCurrentUser] = useState<Profile | null>(null);
     const [authError, setAuthError] = useState<string>('');
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const getSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            setSession(session);
+        setLoading(true);
+
+        const fetchProfile = async (userId: string, attempts = 2): Promise<Profile | null> => {
+            const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
+            if (error) {
+                if (error.code === 'PGRST116' && attempts > 1) { // "PGRST116" is for "0 rows found"
+                    // Wait and retry for new users
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    return fetchProfile(userId, attempts - 1);
+                }
+                
+                // Definitive fix for the [object Object] error. This will log the full error.
+                console.error("Profile fetch error:", JSON.stringify(error, null, 2));
+                setAuthError(`Your user profile could not be loaded: ${error.message}. Please check console for details.`);
+                return null;
+            }
+            return toCamelCase<Profile>(data);
+        };
+
+        const setupUser = async (session: Session | null) => {
+            if (session?.user) {
+                const profile = await fetchProfile(session.user.id);
+                if (profile) {
+                    if (!profile.isActive) {
+                        setAuthError('Your account is inactive. Please contact an administrator.');
+                        await supabase.auth.signOut();
+                        setCurrentUser(null);
+                    } else {
+                        setCurrentUser({ ...profile, email: session.user.email || '' });
+                        setAuthError('');
+                    }
+                } else {
+                    await supabase.auth.signOut();
+                    setCurrentUser(null);
+                }
+            } else {
+                setCurrentUser(null);
+            }
             setLoading(false);
         };
-        
-        getSession();
+
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setupUser(session);
+        });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
+            if (session?.user.id !== currentUser?.id) {
+                setLoading(true);
+                setupUser(session);
+            }
         });
 
         return () => subscription.unsubscribe();
-    }, []);
-
-    useEffect(() => {
-        if (session?.user) {
-            const user: User = {
-                id: session.user.id,
-                email: session.user.email || '',
-                name: session.user.user_metadata?.name || 'User',
-            };
-            setCurrentUser(user);
-        } else {
-            setCurrentUser(null);
-        }
-    }, [session]);
+    }, [currentUser?.id]);
 
 
     const handleLogin = async (details: AuthDetails) => {
@@ -47,20 +86,6 @@ const AppContent: React.FC = () => {
         const { error } = await supabase.auth.signInWithPassword({
             email: details.email,
             password: details.password,
-        });
-        if (error) setAuthError(error.message);
-    };
-
-    const handleSignUp = async (details: SignUpDetails) => {
-        setAuthError('');
-        const { error } = await supabase.auth.signUp({
-            email: details.email,
-            password: details.password,
-            options: {
-                data: {
-                    name: details.name,
-                },
-            },
         });
         if (error) setAuthError(error.message);
     };
@@ -75,7 +100,7 @@ const AppContent: React.FC = () => {
     }
 
     if (!currentUser) {
-        return <Auth onLogin={handleLogin} onSignUp={handleSignUp} error={authError} />;
+        return <Auth onLogin={handleLogin} error={authError} />;
     }
 
     return <MainApp user={currentUser} onLogout={handleLogout} />;

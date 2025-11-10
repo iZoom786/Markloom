@@ -1,9 +1,3 @@
-export interface User {
-    id: string;
-    email: string;
-    name: string;
-}
-
 export enum POStatus {
     Draft = 'Draft',
     Ordered = 'Ordered',
@@ -17,6 +11,18 @@ export enum WorkOrderStatus {
     InProgress = 'In Progress',
     Completed = 'Completed',
     OnHold = 'On Hold',
+}
+
+export const userRoles = ['admin', 'purchase_manager', 'production_manager', 'inventory_manager', 'accountant', 'floor_supervisor', 'viewer'] as const;
+export type UserRole = (typeof userRoles)[number];
+
+export interface Profile {
+    id: string;
+    email: string;
+    fullName: string;
+    role: UserRole;
+    isActive: boolean;
+    profileEmail?: string;
 }
 
 export interface Style {
@@ -55,6 +61,7 @@ export interface InventoryItem {
     materialCode: string;
     quantityOnHand: number;
     minStockLevel: number;
+
     location: string;
     grn?: string;
     poNumber?: string;
@@ -111,4 +118,14 @@ export interface SettingItem {
 
 export interface Currency extends SettingItem {
     isDefault: boolean;
+}
+
+export interface AppSettings {
+    currencies: Currency[];
+    colors: SettingItem[];
+    sizes: SettingItem[];
+    materialTypes: SettingItem[];
+    unitsOfMeasure: SettingItem[];
+    poStatuses: SettingItem[];
+    edgeFunctionApiKey: string;
 }

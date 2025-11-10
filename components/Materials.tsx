@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Material, User, SettingItem } from '../types';
+import { Material, Profile, SettingItem } from '../types';
 import Card from './common/Card';
 import Modal from './common/Modal';
 import { PlusIcon, PencilIcon, Trash2Icon } from './icons';
@@ -32,7 +31,7 @@ const toCamelCase = <T extends {}>(obj: any): T => {
 
 
 interface MaterialsProps {
-    user: User;
+    user: Profile;
     materials: Material[];
     setMaterials: React.Dispatch<React.SetStateAction<Material[]>>;
     settings: {

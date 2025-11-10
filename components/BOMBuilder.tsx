@@ -1,6 +1,5 @@
-
 import React, { useState, useMemo } from 'react';
-import { BOM, Style, SKU, Material, User } from '../types';
+import { BOM, Style, SKU, Material, Profile } from '../types';
 import Card from './common/Card';
 import { PlusIcon, Trash2Icon } from './icons';
 import { supabase } from '../lib/supabaseClient';
@@ -31,7 +30,7 @@ const toCamelCase = <T extends {}>(obj: any): T => {
 
 
 interface BOMBuilderProps {
-    user: User;
+    user: Profile;
     styles: Style[];
     skus: SKU[];
     materials: Material[];

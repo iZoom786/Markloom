@@ -1,6 +1,7 @@
 
+
 import React, { useState } from 'react';
-import { Supplier, User } from '../types';
+import { Supplier, Profile } from '../types';
 import Card from './common/Card';
 import Modal from './common/Modal';
 import { PlusIcon, PencilIcon, Trash2Icon } from './icons';
@@ -31,7 +32,7 @@ const toCamelCase = <T extends {}>(obj: any): T => {
 };
 
 interface SuppliersProps {
-    user: User;
+    user: Profile;
     suppliers: Supplier[];
     setSuppliers: React.Dispatch<React.SetStateAction<Supplier[]>>;
 }

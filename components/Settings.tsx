@@ -1,22 +1,12 @@
-
 import React, { useState } from 'react';
 import Card from './common/Card';
 import { XIcon, StarIcon } from './icons';
 import { supabase } from '../lib/supabaseClient';
-import { SettingItem, Currency } from '../types';
-
-interface SettingsData {
-    currencies: Currency[];
-    colors: SettingItem[];
-    sizes: SettingItem[];
-    materialTypes: SettingItem[];
-    unitsOfMeasure: SettingItem[];
-    poStatuses: SettingItem[];
-}
+import { SettingItem, Currency, AppSettings } from '../types';
 
 interface SettingsProps {
-    settings: SettingsData;
-    setSettings: React.Dispatch<React.SetStateAction<any>>;
+    settings: AppSettings;
+    setSettings: React.Dispatch<React.SetStateAction<AppSettings>>;
 }
 
 // Helper to convert snake_case object keys to camelCase from Supabase
@@ -44,6 +34,24 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
         poStatus: ''
     });
 
+    const [apiKey, setApiKey] = useState(settings.edgeFunctionApiKey);
+    const [isSavingKey, setIsSavingKey] = useState(false);
+
+    const handleSaveApiKey = async () => {
+        setIsSavingKey(true);
+        const { error } = await supabase
+            .from('configuration')
+            .upsert({ key: 'edge_function_api_key', value: apiKey });
+
+        if (error) {
+            alert('Failed to save API key: ' + error.message);
+        } else {
+            alert('API Key saved successfully.');
+            setSettings(prev => ({ ...prev, edgeFunctionApiKey: apiKey }));
+        }
+        setIsSavingKey(false);
+    };
+
     const handleAddItem = async (
         type: 'currencies' | 'colors' | 'sizes' | 'materialTypes' | 'unitsOfMeasure' | 'poStatuses',
         table: 'currencies' | 'colors' | 'sizes' | 'material_types' | 'units_of_measure' | 'po_statuses'
@@ -64,7 +72,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
             alert(`Error adding item: ${error.message}`);
         } else if (data) {
             const newItem = toCamelCase(data);
-            setSettings((prev: SettingsData) => ({ ...prev, [type]: [...prev[type], newItem] }));
+            setSettings((prev: AppSettings) => ({ ...prev, [type]: [...prev[type], newItem] }));
             setNewValues(prev => ({ ...prev, [keyMap[type]]: '' }));
         }
     };
@@ -78,7 +86,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
         if (error) {
             alert(`Error removing item: ${error.message}`);
         } else {
-            setSettings((prev: SettingsData) => ({
+            setSettings((prev: AppSettings) => ({
                 ...prev,
                 [type]: prev[type].filter((item: SettingItem | Currency) => item.id !== id)
             }));
@@ -108,7 +116,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
         if (setError) {
             alert(`Error setting default currency: ${setError.message}`);
         } else if (data) {
-             setSettings((prev: SettingsData) => {
+             setSettings((prev: AppSettings) => {
                 const updatedCurrencies = prev.currencies.map(c => ({
                     ...c,
                     isDefault: c.id === currencyId
@@ -196,6 +204,30 @@ const Settings: React.FC<SettingsProps> = ({ settings, setSettings }) => {
                     {renderListManager('Material Types', 'materialTypes', 'material_types')}
                     {renderListManager('Units of Measure', 'unitsOfMeasure', 'units_of_measure')}
                     {renderListManager('Purchase Order Statuses', 'poStatuses', 'po_statuses')}
+                     <div className="border-t pt-6">
+                        <h3 className="text-lg font-semibold text-gray-900">Integrations</h3>
+                        <p className="text-sm text-gray-500 mt-1">Manage API keys for external services.</p>
+                        <div className="mt-4">
+                            <label className="block text-sm font-medium text-gray-700">Edge Function API Key</label>
+                            <div className="mt-2 flex gap-2">
+                                <input
+                                    type="password"
+                                    value={apiKey}
+                                    onChange={(e) => setApiKey(e.target.value)}
+                                    placeholder="Enter the API key for user creation"
+                                    className="w-full md:w-2/3 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleSaveApiKey}
+                                    disabled={isSavingKey}
+                                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-blue-300">
+                                    {isSavingKey ? 'Saving...' : 'Save'}
+                                </button>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">This key is used to authorize the 'create-user' edge function.</p>
+                        </div>
+                    </div>
                 </div>
             </Card>
         </div>

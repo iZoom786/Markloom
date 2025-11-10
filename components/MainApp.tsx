@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import {
-    User, Style, SKU, Material, InventoryItem, PurchaseOrder, WorkOrder, BOM, Supplier, SettingItem, Currency, PurchaseOrderItem
+    Style, SKU, Material, InventoryItem, PurchaseOrder, WorkOrder, BOM, Supplier, SettingItem, Currency, PurchaseOrderItem, Profile, AppSettings
 } from '../types';
 import Header from './Header';
 import Dashboard from './Dashboard';
@@ -14,26 +14,28 @@ import PurchaseOrders from './PurchaseOrders';
 import WorkOrders from './WorkOrders';
 import Suppliers from './Suppliers';
 import Settings from './Settings';
+import Users from './Users';
 import { 
     HomeIcon, ShirtIcon, BarcodeIcon, LayersIcon, PackageIcon, ClipboardIcon, FileTextIcon, 
     ShoppingCartIcon, UsersIcon, SettingsIcon 
 } from './icons';
 
 interface MainAppProps {
-    user: User;
+    user: Profile;
     onLogout: () => void;
 }
 
-type View = 'dashboard' | 'styles' | 'skus' | 'materials' | 'inventory' | 'boms' | 'purchaseOrders' | 'workOrders' | 'suppliers' | 'settings';
+type View = 'dashboard' | 'styles' | 'skus' | 'materials' | 'inventory' | 'boms' | 'purchaseOrders' | 'workOrders' | 'suppliers' | 'settings' | 'users';
 
+// Convert snake_case → camelCase
 const toCamelCase = <T extends {}>(obj: any): T => {
-    if (obj === null || typeof obj !== 'object') return obj;
+    if (!obj || typeof obj !== 'object') return obj as T;
     if (Array.isArray(obj)) return obj.map(toCamelCase) as any;
 
     const newObj: any = {};
-    for (let key in obj) {
+    for (const key in obj) {
         if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            const camelKey = key.replace(/_([a-z])/g, g => g[1].toUpperCase());
+            const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
             newObj[camelKey] = toCamelCase(obj[key]);
         }
     }
@@ -43,7 +45,8 @@ const toCamelCase = <T extends {}>(obj: any): T => {
 const MainApp: React.FC<MainAppProps> = ({ user, onLogout }) => {
     const [view, setView] = useState<View>('dashboard');
     const [loading, setLoading] = useState(true);
-    
+    const [error, setError] = useState<string | null>(null);
+
     // Data states
     const [styles, setStyles] = useState<Style[]>([]);
     const [skus, setSkus] = useState<SKU[]>([]);
@@ -54,25 +57,28 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout }) => {
     const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
     const [boms, setBoms] = useState<BOM[]>([]);
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-    const [settings, setSettings] = useState({
-        currencies: [] as Currency[],
-        colors: [] as SettingItem[],
-        sizes: [] as SettingItem[],
-        materialTypes: [] as SettingItem[],
-        unitsOfMeasure: [] as SettingItem[],
-        poStatuses: [] as SettingItem[],
+    const [allUsers, setAllUsers] = useState<Profile[]>([]);
+    
+    const [settings, setSettings] = useState<AppSettings>({
+        currencies: [],
+        colors: [],
+        sizes: [],
+        materialTypes: [],
+        unitsOfMeasure: [],
+        poStatuses: [],
+        edgeFunctionApiKey: '',
     });
 
+    // Compute defaultCurrency only after settings loaded
     const defaultCurrency = settings.currencies.find(c => c.isDefault)?.value || 'USD';
-    
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
+            setError(null);
+
             try {
-                const [
-                    stylesRes, skusRes, materialsRes, inventoryRes, poRes, poItemsRes, woRes, bomsRes, suppliersRes,
-                    currenciesRes, colorsRes, sizesRes, materialTypesRes, uomRes, poStatusesRes
-                ] = await Promise.all([
+                const dataPromises = [
                     supabase.from('styles').select('*'),
                     supabase.from('skus').select('*'),
                     supabase.from('materials').select('*'),
@@ -88,83 +94,114 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout }) => {
                     supabase.from('material_types').select('*'),
                     supabase.from('units_of_measure').select('*'),
                     supabase.from('po_statuses').select('*'),
-                ]);
+                    supabase.from('configuration').select('value').eq('key', 'edge_function_api_key').maybeSingle(),
+                ];
 
-                const results = [stylesRes, skusRes, materialsRes, inventoryRes, poRes, poItemsRes, woRes, bomsRes, suppliersRes, currenciesRes, colorsRes, sizesRes, materialTypesRes, uomRes, poStatusesRes];
-                for (const res of results) {
-                    if (res.error) throw res.error;
+                if (user.role === 'admin') {
+                    dataPromises.push(supabase.from('profiles').select('*'));
                 }
 
-                const setData = (setter: React.Dispatch<React.SetStateAction<any[]>>, data: any[] | null) => {
-                    const camelCasedData = toCamelCase(data);
-                    setter(Array.isArray(camelCasedData) ? camelCasedData : []);
-                };
-
-                setData(setStyles, stylesRes.data);
-                setData(setSkus, skusRes.data);
-                setData(setMaterials, materialsRes.data);
-                setData(setInventory, inventoryRes.data);
-                setData(setPurchaseOrders, poRes.data);
-                setData(setWorkOrders, woRes.data);
-                setData(setBoms, bomsRes.data);
-                setData(setSuppliers, suppliersRes.data);
+                const responses = await Promise.all(dataPromises);
                 
-                // Custom mapping for PO Items due to different column naming conventions
-                if (poItemsRes.data) {
-                    setPurchaseOrderItems(poItemsRes.data.map((item: any) => ({
-                        id: item.po_item_id,
-                        poNumber: item.po_number,
-                        materialCode: item.material_code,
-                        quantity: item.quantity_ordered,
-                        unitCost: item.unit_price,
-                    })));
-                } else {
-                    setPurchaseOrderItems([]);
+                const [
+                    stylesRes, skusRes, materialsRes, inventoryRes, poRes, poItemsRes, woRes, bomsRes,
+                    suppliersRes, currenciesRes, colorsRes, sizesRes, materialTypesRes,
+                    uomRes, poStatusesRes, apiKeyRes, profilesRes
+                ] = responses;
+
+                const responseMap = [
+                    { name: 'styles', res: stylesRes }, { name: 'skus', res: skusRes },
+                    { name: 'materials', res: materialsRes }, { name: 'inventory', res: inventoryRes },
+                    { name: 'purchase_orders', res: poRes }, { name: 'po_items', res: poItemsRes },
+                    { name: 'work_orders', res: woRes }, { name: 'boms', res: bomsRes },
+                    { name: 'suppliers', res: suppliersRes },
+                    { name: 'currencies', res: currenciesRes }, { name: 'colors', res: colorsRes },
+                    { name: 'sizes', res: sizesRes }, { name: 'material_types', res: materialTypesRes },
+                    { name: 'units_of_measure', res: uomRes }, { name: 'po_statuses', res: poStatusesRes },
+                    { name: 'apiKey', res: apiKeyRes }, { name: 'profiles', res: profilesRes },
+                ];
+
+                for (const { name, res } of responseMap) {
+                    if (res && res.error) {
+                        console.error(`Error fetching ${name}:`, res.error);
+                        throw new Error(`Failed to load ${name}: ${res.error.message}`);
+                    }
                 }
 
-
-                const getArrayData = (data: any[] | null) => {
-                    const camelCasedData = toCamelCase(data);
-                    return Array.isArray(camelCasedData) ? camelCasedData : [];
+                const setSafe = <T,>(setter: React.Dispatch<React.SetStateAction<T[]>>, data: any[] | null) => {
+                    if (!data) {
+                        setter([]);
+                        return;
+                    }
+                    const camelData = toCamelCase<T[]>(data);
+                    setter(Array.isArray(camelData) ? camelData : []);
                 };
+
+                // FIX: Cast data from Supabase responses to the expected type.
+                // This is necessary because Promise.all with a mix of queries returning arrays
+                // and single objects results in a union type that TypeScript cannot safely infer.
+                setSafe(setStyles, stylesRes.data as any[]);
+                setSafe(setSkus, skusRes.data as any[]);
+                setSafe(setMaterials, materialsRes.data as any[]);
+                setSafe(setInventory, inventoryRes.data as any[]);
+                setSafe(setPurchaseOrders, poRes.data as any[]);
+                setSafe(setWorkOrders, woRes.data as any[]);
+                setSafe(setBoms, bomsRes.data as any[]);
+                setSafe(setSuppliers, suppliersRes.data as any[]);
+                if (profilesRes) setSafe(setAllUsers, profilesRes.data as any[]);
+
+                const poItems = (poItemsRes.data as any[]) || [];
+                setPurchaseOrderItems(poItems.map((item: any) => ({
+                    id: item.id || item.po_item_id,
+                    poNumber: item.po_number,
+                    materialCode: item.material_code,
+                    quantity: item.quantity_ordered || item.quantity,
+                    unitCost: item.unit_price || item.unit_cost,
+                })));
 
                 setSettings({
-                    currencies: getArrayData(currenciesRes.data),
-                    colors: getArrayData(colorsRes.data),
-                    sizes: getArrayData(sizesRes.data),
-                    materialTypes: getArrayData(materialTypesRes.data),
-                    unitsOfMeasure: getArrayData(uomRes.data),
-                    poStatuses: getArrayData(poStatusesRes.data),
+                    currencies: toCamelCase<Currency[]>((currenciesRes.data as any[]) || []),
+                    colors: toCamelCase<SettingItem[]>((colorsRes.data as any[]) || []),
+                    sizes: toCamelCase<SettingItem[]>((sizesRes.data as any[]) || []),
+                    materialTypes: toCamelCase<SettingItem[]>((materialTypesRes.data as any[]) || []),
+                    unitsOfMeasure: toCamelCase<SettingItem[]>((uomRes.data as any[]) || []),
+                    poStatuses: toCamelCase<SettingItem[]>((poStatusesRes.data as any[]) || []),
+                    edgeFunctionApiKey: (apiKeyRes?.data as { value: string } | null)?.value || '',
                 });
 
-            } catch (error: any) {
-                console.error("Error fetching data:", error);
-                let errorMessage = "An unknown error occurred while fetching data.";
-                if (error instanceof Error) {
-                    errorMessage = error.message;
-                } else if (error && typeof error.message === 'string') {
-                    errorMessage = error.message;
-                } else if (typeof error === 'object' && error !== null) {
-                    try {
-                        errorMessage = JSON.stringify(error);
-                    } catch {
-                        errorMessage = "Could not stringify the error object."
-                    }
-                } else if (error) {
-                    errorMessage = String(error);
-                }
-                alert("Could not fetch data: " + errorMessage);
+            } catch (err: any) {
+                console.error('Data fetch failed:', err);
+                setError(err.message || 'Failed to load data. Please try again.');
             } finally {
                 setLoading(false);
             }
         };
 
         fetchData();
-    }, []);
+    }, [user.id, user.role]);
 
     const renderView = () => {
         if (loading) {
-            return <div className="flex justify-center items-center h-full"><p>Loading data...</p></div>;
+            return (
+                <div className="flex justify-center items-center h-64">
+                    <p className="text-lg">Loading data...</p>
+                </div>
+            );
+        }
+
+        if (error) {
+            return (
+                <div className="p-6 bg-red-50 border border-red-200 rounded-lg">
+                    <h3 className="text-red-800 font-semibold">Error Loading Data</h3>
+                    <p className="text-red-600 mt-2">{error}</p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                    >
+                        Retry
+                    </button>
+                </div>
+            );
         }
 
         switch (view) {
@@ -181,28 +218,32 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout }) => {
             case 'boms':
                 return <BOMBuilder user={user} styles={styles} skus={skus} materials={materials} boms={boms} setBoms={setBoms} defaultCurrency={defaultCurrency} />;
             case 'purchaseOrders':
-                return <PurchaseOrders 
-                            user={user} 
-                            purchaseOrders={purchaseOrders} 
-                            setPurchaseOrders={setPurchaseOrders} 
-                            purchaseOrderItems={purchaseOrderItems}
-                            setPurchaseOrderItems={setPurchaseOrderItems}
-                            materials={materials} 
-                            suppliers={suppliers} 
-                            poStatuses={settings.poStatuses} 
-                            defaultCurrency={defaultCurrency} 
-                        />;
+                return (
+                    <PurchaseOrders 
+                        user={user} 
+                        purchaseOrders={purchaseOrders} 
+                        setPurchaseOrders={setPurchaseOrders} 
+                        purchaseOrderItems={purchaseOrderItems}
+                        setPurchaseOrderItems={setPurchaseOrderItems}
+                        materials={materials} 
+                        suppliers={suppliers} 
+                        poStatuses={settings.poStatuses} 
+                        defaultCurrency={defaultCurrency} 
+                    />
+                );
             case 'workOrders':
                 return <WorkOrders user={user} workOrders={workOrders} setWorkOrders={setWorkOrders} styles={styles} skus={skus} boms={boms} materials={materials} inventory={inventory} />;
             case 'suppliers':
                 return <Suppliers user={user} suppliers={suppliers} setSuppliers={setSuppliers} />;
+            case 'users':
+                return <Users currentUser={user} allUsers={allUsers} setAllUsers={setAllUsers} edgeFunctionApiKey={settings.edgeFunctionApiKey} />;
             case 'settings':
                 return <Settings settings={settings} setSettings={setSettings} />;
             default:
                 return <Dashboard styles={styles} inventory={inventory} purchaseOrders={purchaseOrders} workOrders={workOrders} skus={skus} />;
         }
     };
-    
+
     const NavLink: React.FC<{
         currentView: View;
         targetView: View;
@@ -215,9 +256,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout }) => {
             <button
                 onClick={() => onClick(targetView)}
                 className={`flex items-center w-full p-2 rounded-lg text-left transition-colors duration-200 ${
-                    isActive
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-600 hover:bg-gray-200'
+                    isActive ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-200'
                 }`}
             >
                 <span className="mr-3">{icon}</span>
@@ -238,7 +277,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout }) => {
                     <NavLink currentView={view} targetView="skus" onClick={setView} icon={<BarcodeIcon className="w-5 h-5"/>}>SKUs</NavLink>
                     <NavLink currentView={view} targetView="boms" onClick={setView} icon={<FileTextIcon className="w-5 h-5"/>}>BOMs</NavLink>
                     <div className="my-4 border-t"></div>
-                     <h2 className="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Supply Chain</h2>
+                    <h2 className="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Supply Chain</h2>
                     <NavLink currentView={view} targetView="materials" onClick={setView} icon={<LayersIcon className="w-5 h-5"/>}>Materials</NavLink>
                     <NavLink currentView={view} targetView="suppliers" onClick={setView} icon={<UsersIcon className="w-5 h-5"/>}>Suppliers</NavLink>
                     <NavLink currentView={view} targetView="purchaseOrders" onClick={setView} icon={<ShoppingCartIcon className="w-5 h-5"/>}>Purchase Orders</NavLink>
@@ -247,11 +286,17 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout }) => {
                     <h2 className="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Manufacturing</h2>
                     <NavLink currentView={view} targetView="workOrders" onClick={setView} icon={<ClipboardIcon className="w-5 h-5"/>}>Work Orders</NavLink>
                 </nav>
-                 <div>
-                    <div className="my-4 border-t"></div>
-                    <NavLink currentView={view} targetView="settings" onClick={setView} icon={<SettingsIcon className="w-5 h-5"/>}>Settings</NavLink>
-                </div>
+                
+                {user.role === 'admin' && (
+                    <div>
+                        <div className="my-4 border-t"></div>
+                        <h2 className="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Administration</h2>
+                        <NavLink currentView={view} targetView="users" onClick={setView} icon={<UsersIcon className="w-5 h-5"/>}>Users</NavLink>
+                        <NavLink currentView={view} targetView="settings" onClick={setView} icon={<SettingsIcon className="w-5 h-5"/>}>Settings</NavLink>
+                    </div>
+                )}
             </aside>
+
             <main className="flex-1 flex flex-col overflow-hidden">
                 <Header user={user} onLogout={onLogout} />
                 <div className="flex-1 overflow-y-auto p-6">

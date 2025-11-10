@@ -1,7 +1,7 @@
 
 
 import React, { useState, useMemo } from 'react';
-import { InventoryItem, Material, User } from '../types';
+import { InventoryItem, Material, Profile } from '../types';
 import Card from './common/Card';
 import Modal from './common/Modal';
 import { PencilIcon, AlertTriangleIcon, PlusIcon, Trash2Icon } from './icons';
@@ -20,7 +20,7 @@ const toCamelCase = <T extends {}>(obj: any): T => {
 };
 
 interface InventoryProps {
-    user: User;
+    user: Profile;
     inventory: InventoryItem[];
     setInventory: React.Dispatch<React.SetStateAction<InventoryItem[]>>;
     materials: Material[];

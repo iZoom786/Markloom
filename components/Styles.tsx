@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Style, User } from '../types';
+import { Style, Profile } from '../types';
 import Card from './common/Card';
 import Modal from './common/Modal';
 import { PlusIcon, PencilIcon, Trash2Icon } from './icons';
@@ -32,7 +31,7 @@ const toCamelCase = <T extends {}>(obj: any): T => {
 
 
 interface StylesProps {
-    user: User;
+    user: Profile;
     styles: Style[];
     setStyles: React.Dispatch<React.SetStateAction<Style[]>>;
     defaultCurrency: string;

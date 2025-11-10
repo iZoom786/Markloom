@@ -1,6 +1,7 @@
 
+
 import React, { useState, useMemo } from 'react';
-import { SKU, Style, User, SettingItem } from '../types';
+import { SKU, Style, Profile, SettingItem } from '../types';
 import Card from './common/Card';
 import Modal from './common/Modal';
 import { PlusIcon, PencilIcon, Trash2Icon } from './icons';
@@ -31,7 +32,7 @@ const toCamelCase = <T extends {}>(obj: any): T => {
 };
 
 interface SKUsProps {
-    user: User;
+    user: Profile;
     skus: SKU[];
     setSkus: React.Dispatch<React.SetStateAction<SKU[]>>;
     styles: Style[];

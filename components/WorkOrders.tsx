@@ -1,6 +1,7 @@
 
+
 import React, { useState, useMemo } from 'react';
-import { WorkOrder, Style, WorkOrderStatus, BOM, Material, InventoryItem, User, SKU } from '../types';
+import { WorkOrder, Style, WorkOrderStatus, BOM, Material, InventoryItem, Profile, SKU } from '../types';
 import Card from './common/Card';
 import Modal from './common/Modal';
 import { PlusIcon, PencilIcon, Trash2Icon, EyeIcon } from './icons';
@@ -19,7 +20,7 @@ const toCamelCase = <T extends {}>(obj: any): T => {
 };
 
 interface WorkOrdersProps {
-    user: User;
+    user: Profile;
     workOrders: WorkOrder[];
     setWorkOrders: React.Dispatch<React.SetStateAction<WorkOrder[]>>;
     styles: Style[];

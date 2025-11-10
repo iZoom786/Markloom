@@ -1,23 +1,23 @@
-
 import React from 'react';
-import { User } from '../types';
+import { Profile } from '../types';
 import { LogOutIcon } from './icons';
 
 interface HeaderProps {
-    user: User;
+    user: Profile;
     onLogout: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
+    const displayName = user.fullName;
     return (
         <header className="bg-white shadow-sm p-4 flex justify-end items-center z-10 shrink-0">
             <div className="flex items-center gap-4">
                  <div className="text-right">
-                    <p className="font-semibold text-sm">{user.name}</p>
+                    <p className="font-semibold text-sm">{displayName}</p>
                     <p className="text-xs text-gray-500">{user.email}</p>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-xl">
-                    {user.name.charAt(0).toUpperCase()}
+                    {displayName.charAt(0).toUpperCase()}
                 </div>
                 <button
                     onClick={onLogout}

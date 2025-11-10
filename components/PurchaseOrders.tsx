@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { PurchaseOrder, POStatus, PurchaseOrderItem, Material, User, Supplier, SettingItem } from '../types';
+import { PurchaseOrder, POStatus, PurchaseOrderItem, Material, Profile, Supplier, SettingItem } from '../types';
 import Card from './common/Card';
 import Modal from './common/Modal';
 import { PlusIcon, PencilIcon, Trash2Icon, EyeIcon } from './icons';
@@ -226,7 +226,7 @@ const POItemsManagerModal: React.FC<POItemsManagerModalProps> = ({ isOpen, onClo
 
 
 interface PurchaseOrdersProps {
-    user: User;
+    user: Profile;
     purchaseOrders: PurchaseOrder[];
     setPurchaseOrders: React.Dispatch<React.SetStateAction<PurchaseOrder[]>>;
     purchaseOrderItems: PurchaseOrderItem[];
